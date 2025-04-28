@@ -1,0 +1,321 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bazal Siddiq - Professional Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f7fa;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a3c5e 0%, #2a6b8e 100%);
+            color: white;
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        nav {
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            padding: 1rem 0;
+        }
+
+        nav ul li {
+            margin: 0 1.5rem;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #1a3c5e;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: #2ab7ca;
+        }
+
+        section {
+            padding: 3rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        section h2 {
+            font-size: 2rem;
+            color: #1a3c5e;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        section h2::after {
+            content: '';
+            width: 50px;
+            height: 3px;
+            background-color: #2ab7ca;
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+        }
+
+        .profile, .education, .work, .projects, .skills, .contact {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .education ul, .work ul, .projects ul {
+            list-style: none;
+        }
+
+        .education ul li, .work ul li, .projects ul li {
+            margin-bottom: 1.5rem;
+        }
+
+        .education ul li h3, .work ul li h3, .projects ul li h3 {
+            font-size: 1.2rem;
+            color: #1a3c5e;
+        }
+
+        .skills ul {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            list-style: none;
+        }
+
+        .skills ul li {
+            background-color: #2ab7ca;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .contact p {
+            margin-bottom: 1rem;
+        }
+
+        .contact a {
+            color: #2ab7ca;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .contact a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            background-color: #1a3c5e;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            nav ul li {
+                margin: 0.5rem 0;
+            }
+
+            section {
+                padding: 2rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Bazal Siddiq</h1>
+        <p></p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#profile">Profile</a></li>
+            <li><a href="#education">Education</a></li>
+            <li><a href="#work">Work Experience</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <section id="profile" class="profile">
+        <h2>Profile</h2>
+        <p>A driven and tech-savvy individual with a strong foundation in computer operations and office management, eager to contribute to organizational growth through efficiency and innovation.</p>
+    </section>
+
+    <section id="education" class="education">
+        <h2>Education</h2>
+        <ul>
+            <li>
+                <h3>Associate Degree in Arts</h3>
+                <p>University of the Punjab, Lahore | 2021 | 404/800</p>
+            </li>
+            <li>
+                <h3>Intermediate (Pre-Engineering)</h3>
+                <p>Board of Intermediate and Secondary Education, Rawalpindi | 2019 | 558/1100</p>
+            </li>
+            <li>
+                <h3>Matriculation (Science)</h3>
+                <p>Board of Intermediate and Secondary Education, Rawalpindi | 2016 | 727/1100</p>
+            </li>
+        </ul>
+    </section>
+
+    <section id="work" class="work">
+        <h2>Work Experience</h2>
+        <ul>
+            <li>
+                <h3>Computer Operator</h3>
+                <p><strong>Key Role:</strong> Creating, formatting, and managing documents using Microsoft Word, and performing accurate data entry on various websites.</p>
+                <p><strong>Key Impact:</strong> Improved document organization and data accuracy, enhancing operational efficiency.</p>
+                <p><strong>Other Role:</strong> Maintained high attention to detail to ensure quality and thoroughness in all tasks.</p>
+                <p><strong>Impact:</strong> Streamlined workflows and reduced errors in data management processes.</p>
+            </li>
+            <li>
+                <h3>Office Support Assistant, Chakwal (2022 - Present)</h3>
+                <p><strong>Role:</strong> Assisted in coordinating office tasks, including document preparation and data entry, to support team operations.</p>
+                <p><strong>Impact:</strong> Ensured smooth workflow by maintaining organized records and timely task completion.</p>
+            </li>
+        </ul>
+    </section>
+
+    <section id="projects" class="projects">
+        <h2>Projects</h2>
+        <ul>
+            <li>
+                <h3>Document Management System Optimization</h3>
+                <p>Developed a structured approach to organize and format documents using Microsoft Word for efficient retrieval and use.</p>
+                <p><strong>Significant Learnings:</strong> Enhanced skills in document formatting and time management.</p>
+                <p><strong>Impact:</strong> Reduced document processing time and improved accessibility for team members.</p>
+            </li>
+            <li>
+                <h3>Data Entry Automation</h3>
+                <p>Implemented techniques to streamline data entry processes on company websites.</p>
+                <p><strong>Relevant Insights:</strong> Learned the importance of accuracy and consistency in data management.</p>
+            </li>
+        </ul>
+    </section>
+
+    <section id="skills" class="skills">
+        <h2>Skills</h2>
+        <ul>
+            <li>Microsoft Office Suite</li>
+            <li>Data Entry</li>
+            <li>Document Formatting</li>
+            <li>Office Management</li>
+            <li>Computer Operations</li>
+            <li>Time Management</li>
+            <li>Networking</li>
+            <li>Email Management</li>
+            <li>Cloud Services</li>
+        </ul>
+    </section>
+
+    <section id="contact" class="contact">
+        <h2>Contact</h2>
+        <p>Email: <a href="mailto:bazalsiddiq44@gmail.com">bazalsiddiq44@gmail.com</a></p>
+        <p>Phone: <a href="tel:+923165513667">+923165513667</a></p>
+        <p>Address: Dhako Road, Mohalla Bahadur Abad, Chakwal, Pakistan</p>
+    </section>
+
+    <footer>
+        <p>© 2025 Bazal Siddiq. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const sectionId = this.getAttribute('href');
+                document.querySelector(sectionId).scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
